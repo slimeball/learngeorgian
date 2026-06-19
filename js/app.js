@@ -1,0 +1,447 @@
+import {
+  ALPHABET,
+  GROUPS,
+  GRID_COLS,
+  getAcceptedAnswers,
+  getGroupItems,
+  isCorrectAnswer,
+} from './alphabet.js';
+
+const STORAGE_KEY = 'real-mkhedruli-settings';
+const SELECT_KEY = 'real-mkhedruli-selected';
+
+const defaultSettings = {
+  direction: 'letter-to-roman',
+  order: 'random',
+  showIpa: true,
+  showExample: true,
+  autoReveal: true,
+};
+
+let settings = loadSettings();
+let selected = new Set(loadSelected());
+let studyQueue = [];
+let studyIndex = 0;
+let studyCorrect = 0;
+let studySkipped = 0;
+
+const views = document.querySelectorAll('.view');
+const tabs = document.querySelectorAll('.tab');
+
+init();
+
+function init() {
+  bindNavigation();
+  bindSelection();
+  bindStudy();
+  bindSettings();
+  renderAlphabetGrid();
+  renderGroups();
+  renderSelectionTray();
+  applySettingsToForm();
+  showView('select');
+}
+
+function loadSettings() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? { ...defaultSettings, ...JSON.parse(raw) } : { ...defaultSettings };
+  } catch {
+    return { ...defaultSettings };
+  }
+}
+
+function saveSettings() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+}
+
+function loadSelected() {
+  try {
+    const raw = localStorage.getItem(SELECT_KEY);
+    if (!raw) return ALPHABET.map((item) => item.letter);
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : ALPHABET.map((item) => item.letter);
+  } catch {
+    return ALPHABET.map((item) => item.letter);
+  }
+}
+
+function persistSelected() {
+  localStorage.setItem(SELECT_KEY, JSON.stringify([...selected]));
+}
+
+function bindNavigation() {
+  document.body.addEventListener('click', (event) => {
+    const target = event.target.closest('[data-view]');
+    if (!target) return;
+    event.preventDefault();
+    const view = target.dataset.view;
+    if (view === 'study' && target.id !== 'btn-start-study') {
+      startStudy();
+    }
+    showView(view);
+  });
+
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const view = tab.dataset.view;
+      if (view === 'study') startStudy();
+      showView(view);
+    });
+  });
+}
+
+function showView(name) {
+  views.forEach((view) => {
+    view.classList.toggle('active', view.id === `view-${name}`);
+  });
+
+  tabs.forEach((tab) => {
+    tab.classList.toggle('active', tab.dataset.view === name);
+  });
+
+  if (name === 'study') {
+    updateStudyUI();
+  }
+}
+
+function bindSelection() {
+  document.getElementById('btn-add-all').addEventListener('click', () => {
+    selected = new Set(ALPHABET.map((item) => item.letter));
+    persistSelected();
+    renderAlphabetGrid();
+    renderGroups();
+    renderSelectionTray();
+  });
+
+  document.getElementById('btn-clear').addEventListener('click', () => {
+    selected.clear();
+    persistSelected();
+    renderAlphabetGrid();
+    renderGroups();
+    renderSelectionTray();
+  });
+
+  document.getElementById('btn-start-study').addEventListener('click', () => {
+    startStudy();
+    showView('study');
+  });
+}
+
+function toggleLetter(letter) {
+  if (selected.has(letter)) {
+    selected.delete(letter);
+  } else {
+    selected.add(letter);
+  }
+  persistSelected();
+  renderAlphabetGrid();
+  renderGroups();
+  renderSelectionTray();
+}
+
+function renderAlphabetGrid() {
+  const grid = document.getElementById('alphabet-grid');
+  grid.innerHTML = '';
+
+  ALPHABET.forEach((item, index) => {
+    if (index > 0 && index % GRID_COLS === 0) {
+      grid.appendChild(document.createElement('div')).className = 'grid-break';
+    }
+
+    const cell = document.createElement('button');
+    cell.type = 'button';
+    cell.className = `char-cell${selected.has(item.letter) ? ' selected' : ''}`;
+    cell.dataset.letter = item.letter;
+    cell.innerHTML = `
+      <span class="char-letter">${item.letter}</span>
+      <span class="char-roman">${item.roman}</span>
+    `;
+    cell.addEventListener('click', () => toggleLetter(item.letter));
+    grid.appendChild(cell);
+  });
+}
+
+function renderGroups() {
+  const container = document.getElementById('groups-container');
+  container.innerHTML = '';
+
+  Object.values(GROUPS).forEach((group) => {
+    const items = getGroupItems(group.id);
+    const section = document.createElement('section');
+    section.className = 'group-section';
+
+    const allSelected = items.every((item) => selected.has(item.letter));
+
+    section.innerHTML = `
+      <div class="group-header">
+        <div>
+          <h3>${group.label}</h3>
+          <p>${group.desc}</p>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm group-toggle" data-group="${group.id}">
+          ${allSelected ? '取消全选' : '全选本组'}
+        </button>
+      </div>
+      <div class="char-grid group-grid" data-group-grid="${group.id}"></div>
+    `;
+
+    const grid = section.querySelector('.group-grid');
+    items.forEach((item) => {
+      const cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = `char-cell${selected.has(item.letter) ? ' selected' : ''}`;
+      cell.innerHTML = `
+        <span class="char-letter">${item.letter}</span>
+        <span class="char-roman">${item.roman}</span>
+      `;
+      cell.addEventListener('click', () => toggleLetter(item.letter));
+      grid.appendChild(cell);
+    });
+
+    section.querySelector('.group-toggle').addEventListener('click', () => {
+      if (allSelected) {
+        items.forEach((item) => selected.delete(item.letter));
+      } else {
+        items.forEach((item) => selected.add(item.letter));
+      }
+      persistSelected();
+      renderAlphabetGrid();
+      renderGroups();
+      renderSelectionTray();
+    });
+
+    container.appendChild(section);
+  });
+}
+
+function renderSelectionTray() {
+  const tray = document.getElementById('selection-tray');
+  tray.innerHTML = '';
+
+  if (selected.size === 0) {
+    tray.innerHTML = '<span class="tray-empty">未选择字母</span>';
+    return;
+  }
+
+  ALPHABET.filter((item) => selected.has(item.letter)).forEach((item) => {
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'tray-chip';
+    chip.textContent = item.letter;
+    chip.title = item.roman;
+    chip.addEventListener('click', () => toggleLetter(item.letter));
+    tray.appendChild(chip);
+  });
+}
+
+function bindSettings() {
+  const form = document.getElementById('settings-form');
+  form.addEventListener('change', () => {
+    settings = {
+      direction: document.getElementById('setting-direction').value,
+      order: document.getElementById('setting-order').value,
+      showIpa: document.getElementById('setting-show-ipa').checked,
+      showExample: document.getElementById('setting-show-example').checked,
+      autoReveal: document.getElementById('setting-auto-reveal').checked,
+    };
+    saveSettings();
+    updateStudyHint();
+  });
+}
+
+function applySettingsToForm() {
+  document.getElementById('setting-direction').value = settings.direction;
+  document.getElementById('setting-order').value = settings.order;
+  document.getElementById('setting-show-ipa').checked = settings.showIpa;
+  document.getElementById('setting-show-example').checked = settings.showExample;
+  document.getElementById('setting-auto-reveal').checked = settings.autoReveal;
+  updateStudyHint();
+}
+
+function updateStudyHint() {
+  const hint = document.getElementById('study-hint');
+  hint.textContent =
+    settings.direction === 'letter-to-roman'
+      ? '看到格鲁吉亚字母，输入拉丁转写'
+      : '看到转写，输入对应的格鲁吉亚字母';
+}
+
+function startStudy() {
+  const items = ALPHABET.filter((item) => selected.has(item.letter));
+  if (items.length === 0) {
+    studyQueue = [];
+    updateStudyUI();
+    return;
+  }
+
+  studyQueue =
+    settings.order === 'random' ? shuffle([...items]) : [...items];
+  studyIndex = 0;
+  studyCorrect = 0;
+  studySkipped = 0;
+  updateStudyUI();
+  showCurrentQuestion();
+}
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+function bindStudy() {
+  const form = document.getElementById('study-form');
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    submitAnswer();
+  });
+
+  document.getElementById('btn-skip').addEventListener('click', () => {
+    studySkipped += 1;
+    revealFeedback(false, true);
+    setTimeout(nextQuestion, 900);
+  });
+
+  document.getElementById('btn-reveal').addEventListener('click', () => {
+    revealFeedback(false, false, true);
+  });
+
+  document.getElementById('btn-speak').addEventListener('click', speakCurrent);
+  document.getElementById('btn-restart').addEventListener('click', () => {
+    startStudy();
+  });
+}
+
+function updateStudyUI() {
+  const empty = document.getElementById('study-empty');
+  const active = document.getElementById('study-active');
+  const done = document.getElementById('study-done');
+
+  if (selected.size === 0 || studyQueue.length === 0) {
+    empty.classList.remove('hidden');
+    active.classList.add('hidden');
+    done.classList.add('hidden');
+    return;
+  }
+
+  if (studyIndex >= studyQueue.length) {
+    empty.classList.add('hidden');
+    active.classList.add('hidden');
+    done.classList.remove('hidden');
+    document.getElementById('study-summary').textContent =
+      `共 ${studyQueue.length} 题，正确 ${studyCorrect}，跳过 ${studySkipped}`;
+    return;
+  }
+
+  empty.classList.add('hidden');
+  active.classList.remove('hidden');
+  done.classList.add('hidden');
+
+  document.getElementById('study-progress').textContent =
+    `${studyIndex + 1} / ${studyQueue.length}`;
+  document.getElementById('study-score').textContent = `✓ ${studyCorrect}`;
+}
+
+function showCurrentQuestion() {
+  updateStudyUI();
+  if (studyIndex >= studyQueue.length) return;
+
+  const item = studyQueue[studyIndex];
+  const prompt = document.getElementById('study-prompt');
+  const sub = document.getElementById('study-sub');
+  const input = document.getElementById('study-input');
+  const feedback = document.getElementById('study-feedback');
+
+  feedback.textContent = '';
+  feedback.className = 'study-feedback';
+  input.value = '';
+  input.disabled = false;
+  input.classList.remove('correct', 'incorrect');
+
+  if (settings.direction === 'letter-to-roman') {
+    prompt.textContent = item.letter;
+    prompt.className = 'study-prompt georgian';
+    sub.textContent = settings.showExample ? item.example : '';
+  } else {
+    prompt.textContent = item.roman;
+    prompt.className = 'study-prompt roman';
+    sub.textContent = settings.showExample ? item.example.split(' ')[0] : '';
+  }
+
+  if (settings.showIpa) {
+    sub.textContent = [sub.textContent, item.ipa].filter(Boolean).join(' · ');
+  }
+
+  input.placeholder =
+    settings.direction === 'letter-to-roman' ? '输入转写…' : '输入字母…';
+
+  input.focus();
+}
+
+function submitAnswer() {
+  const input = document.getElementById('study-input');
+  const item = studyQueue[studyIndex];
+  const correct = isCorrectAnswer(item, input.value, settings.direction);
+
+  if (correct) {
+    studyCorrect += 1;
+    revealFeedback(true);
+    setTimeout(nextQuestion, 650);
+  } else {
+    revealFeedback(false);
+    if (settings.autoReveal) {
+      setTimeout(nextQuestion, 1400);
+    } else {
+      input.classList.add('incorrect');
+      input.focus();
+      input.select();
+    }
+  }
+}
+
+function revealFeedback(correct, skipped = false, manual = false) {
+  const item = studyQueue[studyIndex];
+  const input = document.getElementById('study-input');
+  const feedback = document.getElementById('study-feedback');
+  const accepted = getAcceptedAnswers(item, settings.direction).join(' / ');
+
+  input.disabled = true;
+
+  if (correct) {
+    input.classList.add('correct');
+    feedback.className = 'study-feedback success';
+    feedback.textContent = '正确！';
+    return;
+  }
+
+  input.classList.add('incorrect');
+  feedback.className = 'study-feedback error';
+
+  if (skipped) {
+    feedback.textContent = `跳过 · 答案：${accepted}`;
+  } else if (manual) {
+    feedback.textContent = `答案：${accepted}${item.example ? ` · ${item.example}` : ''}`;
+  } else {
+    feedback.textContent = `不对，正确答案：${accepted}`;
+  }
+}
+
+function nextQuestion() {
+  studyIndex += 1;
+  showCurrentQuestion();
+}
+
+function speakCurrent() {
+  if (studyIndex >= studyQueue.length) return;
+  const item = studyQueue[studyIndex];
+  if (!('speechSynthesis' in window)) return;
+
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(item.letter);
+  utterance.lang = 'ka-GE';
+  utterance.rate = 0.85;
+  window.speechSynthesis.speak(utterance);
+}
