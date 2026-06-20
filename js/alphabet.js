@@ -1,48 +1,62 @@
+import { t } from './i18n.js';
+
 export const GROUPS = {
-  vowels: { id: 'vowels', label: '元音', desc: '5 个元音字母' },
-  basic: { id: 'basic', label: '普通辅音', desc: '常见辅音，与英语相近' },
-  aspirated: { id: 'aspirated', label: '送气辅音', desc: '发音时伴随明显气流' },
-  ejective: { id: 'ejective', label: '挤喉辅音', desc: '格鲁吉亚语特有，喉部弹出' },
-  fricative: { id: 'fricative', label: '擦音与其他', desc: 'sh, zh, kh, gh 等' },
+  vowels: { id: 'vowels', labelKey: 'group.vowels.label', descKey: 'group.vowels.desc' },
+  basic: { id: 'basic', labelKey: 'group.basic.label', descKey: 'group.basic.desc' },
+  aspirated: { id: 'aspirated', labelKey: 'group.aspirated.label', descKey: 'group.aspirated.desc' },
+  ejective: { id: 'ejective', labelKey: 'group.ejective.label', descKey: 'group.ejective.desc' },
+  fricative: { id: 'fricative', labelKey: 'group.fricative.label', descKey: 'group.fricative.desc' },
 };
 
 export const ALPHABET = [
-  { letter: 'ა', roman: 'a', ipa: '/ɑ/', group: 'vowels', example: 'ამა ama · 这个', alt: ['aa'] },
-  { letter: 'ბ', roman: 'b', ipa: '/b/', group: 'basic', example: 'ბავშვი bavshvi · 孩子', alt: [] },
-  { letter: 'გ', roman: 'g', ipa: '/ɡ/', group: 'basic', example: 'გამარჯობა gamarjoba · 你好', alt: [] },
-  { letter: 'დ', roman: 'd', ipa: '/d/', group: 'basic', example: 'დედა deda · 母亲', alt: [] },
-  { letter: 'ე', roman: 'e', ipa: '/ɛ/', group: 'vowels', example: 'ენა ena · 语言', alt: [] },
-  { letter: 'ვ', roman: 'v', ipa: '/v/', group: 'basic', example: 'ვაშლი vashli · 苹果', alt: [] },
-  { letter: 'ზ', roman: 'z', ipa: '/z/', group: 'basic', example: 'ზღვა zghva · 海', alt: [] },
-  { letter: 'თ', roman: 't', ipa: '/tʰ/', group: 'aspirated', example: 'თევზი tevzi · 鱼', alt: ['th'] },
-  { letter: 'ი', roman: 'i', ipa: '/i/', group: 'vowels', example: 'იავი yavi · 大麦', alt: ['y'] },
-  { letter: 'კ', roman: "k'", ipa: '/kʼ/', group: 'ejective', example: "კარი k'ari · 门", alt: ['k', 'k’', 'kʼ', 'q'] },
-  { letter: 'ლ', roman: 'l', ipa: '/l/', group: 'basic', example: 'ლამაზი lamazi · 美丽', alt: [] },
-  { letter: 'მ', roman: 'm', ipa: '/m/', group: 'basic', example: 'მამა mama · 父亲', alt: [] },
-  { letter: 'ნ', roman: 'n', ipa: '/n/', group: 'basic', example: 'ნათელი nateli · 明亮', alt: [] },
-  { letter: 'ო', roman: 'o', ipa: '/ɔ/', group: 'vowels', example: 'ორი ori · 二', alt: [] },
-  { letter: 'პ', roman: "p'", ipa: '/pʼ/', group: 'ejective', example: "პური p'uri · 面包", alt: ['p', 'p’', 'pʼ'] },
-  { letter: 'ჟ', roman: 'zh', ipa: '/ʒ/', group: 'fricative', example: 'ჟურნალისტი zhurnalisti · 记者', alt: ['j', 'z'] },
-  { letter: 'რ', roman: 'r', ipa: '/r/', group: 'basic', example: 'რა ra · 什么', alt: [] },
-  { letter: 'ს', roman: 's', ipa: '/s/', group: 'basic', example: 'სახლი sakhli · 房子', alt: [] },
-  { letter: 'ტ', roman: "t'", ipa: '/tʼ/', group: 'ejective', example: "ტყე t'qe · 风", alt: ['t', 't’', 'tʼ'] },
-  { letter: 'უ', roman: 'u', ipa: '/u/', group: 'vowels', example: 'ური uri · 油', alt: [] },
-  { letter: 'ფ', roman: 'p', ipa: '/pʰ/', group: 'aspirated', example: 'ფული puli · 钱', alt: ['ph', 'f'] },
-  { letter: 'ქ', roman: 'k', ipa: '/kʰ/', group: 'aspirated', example: 'ქალაქი kalaki · 城市', alt: ['kh', 'q', 'c'] },
-  { letter: 'ღ', roman: 'gh', ipa: '/ɣ/', group: 'fricative', example: 'ღამე ghame · 夜晚', alt: ['g', 'r'] },
-  { letter: 'ყ', roman: "q'", ipa: '/qʼ/', group: 'ejective', example: "ყველი q'veli · 奶酪", alt: ['q', 'k', "k'", 'q’', 'qʼ'] },
-  { letter: 'შ', roman: 'sh', ipa: '/ʃ/', group: 'fricative', example: 'შენ shen · 你', alt: ['s', 'sch'] },
-  { letter: 'ჩ', roman: 'ch', ipa: '/tʃʰ/', group: 'aspirated', example: 'ჩაი chai · 茶', alt: ['tch', 'c'] },
-  { letter: 'ც', roman: 'ts', ipa: '/tsʰ/', group: 'aspirated', example: 'ცხენი tskheni · 马', alt: ['c', 'tz'] },
-  { letter: 'ძ', roman: 'dz', ipa: '/dz/', group: 'fricative', example: 'ძაღლი dzaghli · 狗', alt: ['z', 'ds'] },
-  { letter: 'წ', roman: "ts'", ipa: '/tsʼ/', group: 'ejective', example: "წელი ts'eli · 年", alt: ['ts', 'c', 'ts’', 'tsʼ', 'w'] },
-  { letter: 'ჭ', roman: "ch'", ipa: '/tʃʼ/', group: 'ejective', example: "ჭა ch'a · 井", alt: ['ch', 'tch', 'ch’', 'chʼ'] },
-  { letter: 'ხ', roman: 'kh', ipa: '/χ/', group: 'fricative', example: 'ხელი kheli · 手', alt: ['x', 'h', 'ch'] },
-  { letter: 'ჯ', roman: 'j', ipa: '/dʒ/', group: 'fricative', example: 'ჯამი jami · 碗', alt: ['dj', 'zh', 'dzh'] },
-  { letter: 'ჰ', roman: 'h', ipa: '/h/', group: 'fricative', example: 'ჰაერი haeri · 空气', alt: [] },
+  { letter: 'ა', roman: 'a', ipa: '/ɑ/', group: 'vowels', exampleWord: 'ამა ama', glossKey: 'ex.a', audio: 'audio/01-a.mp3' },
+  { letter: 'ბ', roman: 'b', ipa: '/b/', group: 'basic', exampleWord: 'ბავშვი bavshvi', glossKey: 'ex.b', audio: 'audio/02-b.mp3' },
+  { letter: 'გ', roman: 'g', ipa: '/ɡ/', group: 'basic', exampleWord: 'გამარჯობა gamarjoba', glossKey: 'ex.g', audio: 'audio/03-g.mp3' },
+  { letter: 'დ', roman: 'd', ipa: '/d/', group: 'basic', exampleWord: 'დედა deda', glossKey: 'ex.d', audio: 'audio/04-d.mp3' },
+  { letter: 'ე', roman: 'e', ipa: '/ɛ/', group: 'vowels', exampleWord: 'ენა ena', glossKey: 'ex.e', audio: 'audio/05-e.mp3' },
+  { letter: 'ვ', roman: 'v', ipa: '/v/', group: 'basic', exampleWord: 'ვაშლი vashli', glossKey: 'ex.v', audio: 'audio/06-v.mp3' },
+  { letter: 'ზ', roman: 'z', ipa: '/z/', group: 'basic', exampleWord: 'ზღვა zghva', glossKey: 'ex.z', audio: 'audio/07-z.mp3' },
+  { letter: 'თ', roman: 't', ipa: '/tʰ/', group: 'aspirated', exampleWord: 'თევზი tevzi', glossKey: 'ex.t', audio: 'audio/08-t.mp3' },
+  { letter: 'ი', roman: 'i', ipa: '/i/', group: 'vowels', exampleWord: 'იავი yavi', glossKey: 'ex.i', audio: 'audio/09-i.mp3' },
+  { letter: 'კ', roman: 'k\'', ipa: '/kʼ/', group: 'ejective', exampleWord: 'კარი k\'ari', glossKey: 'ex.kEj', audio: 'audio/10-k.mp3' },
+  { letter: 'ლ', roman: 'l', ipa: '/l/', group: 'basic', exampleWord: 'ლამაზი lamazi', glossKey: 'ex.l', audio: 'audio/11-l.mp3' },
+  { letter: 'მ', roman: 'm', ipa: '/m/', group: 'basic', exampleWord: 'მამა mama', glossKey: 'ex.m', audio: 'audio/12-m.mp3' },
+  { letter: 'ნ', roman: 'n', ipa: '/n/', group: 'basic', exampleWord: 'ნათელი nateli', glossKey: 'ex.n', audio: 'audio/13-n.mp3' },
+  { letter: 'ო', roman: 'o', ipa: '/ɔ/', group: 'vowels', exampleWord: 'ორი ori', glossKey: 'ex.o', audio: 'audio/14-o.mp3' },
+  { letter: 'პ', roman: 'p\'', ipa: '/pʼ/', group: 'ejective', exampleWord: 'პური p\'uri', glossKey: 'ex.pEj', audio: 'audio/15-p.mp3' },
+  { letter: 'ჟ', roman: 'zh', ipa: '/ʒ/', group: 'fricative', exampleWord: 'ჟურნალისტი zhurnalisti', glossKey: 'ex.zh', audio: 'audio/16-zh.mp3' },
+  { letter: 'რ', roman: 'r', ipa: '/r/', group: 'basic', exampleWord: 'რა ra', glossKey: 'ex.r', audio: 'audio/17-r.mp3' },
+  { letter: 'ს', roman: 's', ipa: '/s/', group: 'basic', exampleWord: 'სახლი sakhli', glossKey: 'ex.s', audio: 'audio/18-s.mp3' },
+  { letter: 'ტ', roman: 't\'', ipa: '/tʼ/', group: 'ejective', exampleWord: 'ტყე t\'qe', glossKey: 'ex.tEj', audio: 'audio/19-t.mp3' },
+  { letter: 'უ', roman: 'u', ipa: '/u/', group: 'vowels', exampleWord: 'ური uri', glossKey: 'ex.u', audio: 'audio/20-u.mp3' },
+  { letter: 'ფ', roman: 'p', ipa: '/pʰ/', group: 'aspirated', exampleWord: 'ფული puli', glossKey: 'ex.pAsp', audio: 'audio/21-p.mp3' },
+  { letter: 'ქ', roman: 'k', ipa: '/kʰ/', group: 'aspirated', exampleWord: 'ქალაქი kalaki', glossKey: 'ex.kAsp', audio: 'audio/22-k.mp3' },
+  { letter: 'ღ', roman: 'gh', ipa: '/ɣ/', group: 'fricative', exampleWord: 'ღამე ghame', glossKey: 'ex.gh', audio: 'audio/23-gh.mp3' },
+  { letter: 'ყ', roman: 'q\'', ipa: '/qʼ/', group: 'ejective', exampleWord: 'ყველი q\'veli', glossKey: 'ex.qEj', audio: 'audio/24-q.mp3' },
+  { letter: 'შ', roman: 'sh', ipa: '/ʃ/', group: 'fricative', exampleWord: 'შენ shen', glossKey: 'ex.sh', audio: 'audio/25-sh.mp3' },
+  { letter: 'ჩ', roman: 'ch', ipa: '/tʃʰ/', group: 'aspirated', exampleWord: 'ჩაი chai', glossKey: 'ex.ch', audio: 'audio/26-ch.mp3' },
+  { letter: 'ც', roman: 'ts', ipa: '/tsʰ/', group: 'aspirated', exampleWord: 'ცხენი tskheni', glossKey: 'ex.ts', audio: 'audio/27-ts.mp3' },
+  { letter: 'ძ', roman: 'dz', ipa: '/dz/', group: 'fricative', exampleWord: 'ძაღლი dzaghli', glossKey: 'ex.dz', audio: 'audio/28-dz.mp3' },
+  { letter: 'წ', roman: 'ts\'', ipa: '/tsʼ/', group: 'ejective', exampleWord: 'წელი ts\'eli', glossKey: 'ex.tsEj', audio: 'audio/29-ts.mp3' },
+  { letter: 'ჭ', roman: 'ch\'', ipa: '/tʃʼ/', group: 'ejective', exampleWord: 'ჭა ch\'a', glossKey: 'ex.chEj', audio: 'audio/30-ch.mp3' },
+  { letter: 'ხ', roman: 'kh', ipa: '/χ/', group: 'fricative', exampleWord: 'ხელი kheli', glossKey: 'ex.kh', audio: 'audio/22-k.mp3' },
+  { letter: 'ჯ', roman: 'j', ipa: '/dʒ/', group: 'fricative', exampleWord: 'ჯამი jami', glossKey: 'ex.j', audio: 'audio/32-j.mp3' },
+  { letter: 'ჰ', roman: 'h', ipa: '/h/', group: 'fricative', exampleWord: 'ჰაერი haeri', glossKey: 'ex.h', audio: 'audio/33-h.mp3' },
 ];
 
 export const GRID_COLS = 11;
+
+export function getExampleText(item) {
+  return `${item.exampleWord} · ${t(item.glossKey)}`;
+}
+
+export function getGroupLabel(group) {
+  return t(group.labelKey);
+}
+
+export function getGroupDesc(group) {
+  return t(group.descKey);
+}
 
 export function getByLetter(letter) {
   return ALPHABET.find((item) => item.letter === letter);
@@ -65,16 +79,15 @@ export function isCorrectAnswer(item, answer, direction) {
   if (!normalized) return false;
 
   if (direction === 'letter-to-roman') {
-    const accepted = [item.roman, ...item.alt].map(normalizeAnswer);
-    return accepted.includes(normalized);
+    return normalized === normalizeAnswer(item.roman);
   }
 
-  return normalizeAnswer(item.letter) === normalized;
+  return normalized === normalizeAnswer(item.letter);
 }
 
 export function getAcceptedAnswers(item, direction) {
   if (direction === 'letter-to-roman') {
-    return [item.roman, ...item.alt];
+    return [item.roman];
   }
   return [item.letter];
 }

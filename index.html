@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Real Mkhedruli | 格鲁吉亚语字母学习</title>
+  <title>Real Mkhedruli | Learn Georgian Alphabet</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,57 +16,58 @@
       <span class="logo-text">Real Mkhedruli</span>
     </a>
     <nav class="site-nav">
-      <a href="#" data-view="about">关于</a>
+      <div class="lang-switch" role="group" aria-label="Language">
+        <button type="button" class="lang-btn active" data-lang="en">EN</button>
+        <button type="button" class="lang-btn" data-lang="zh-TW">繁中</button>
+      </div>
+      <a href="#" data-view="about" data-i18n="navAbout">About</a>
     </nav>
   </header>
 
   <main class="main">
     <div class="card">
       <nav class="tabs" role="tablist">
-        <button class="tab active" data-view="select" role="tab">字母</button>
-        <button class="tab" data-view="groups" role="tab">分组</button>
-        <button class="tab" data-view="study" role="tab">练习</button>
-        <button class="tab" data-view="settings" role="tab">设置</button>
+        <button class="tab active" data-view="select" role="tab" data-i18n="tabLetters">Letters</button>
+        <button class="tab" data-view="groups" role="tab" data-i18n="tabGroups">Groups</button>
+        <button class="tab" data-view="study" role="tab" data-i18n="tabStudy">Study</button>
+        <button class="tab" data-view="settings" role="tab" data-i18n="tabSettings">Settings</button>
       </nav>
 
-      <!-- 字母选择 -->
       <section id="view-select" class="view active">
         <div class="view-header">
           <span class="view-icon">ა</span>
           <div>
-            <h1>格鲁吉亚字母</h1>
-            <h2>单字母 · Mkhedruli</h2>
-            <p class="hint">选择要练习的字母，然后点击「开始练习」。</p>
+            <h1 data-i18n="selectTitle">Georgian Alphabet</h1>
+            <h2 data-i18n="selectSubtitle">Single Letters · Mkhedruli</h2>
+            <p class="hint" data-i18n="selectHint">Choose letters to practice, then click Start Study.</p>
           </div>
         </div>
         <div id="alphabet-grid" class="char-grid"></div>
         <div id="selection-tray" class="selection-tray"></div>
         <div class="actions">
-          <button type="button" class="btn btn-secondary" id="btn-add-all">全部添加</button>
-          <button type="button" class="btn btn-secondary" id="btn-clear">清空</button>
-          <button type="button" class="btn btn-primary" id="btn-start-study">开始练习</button>
+          <button type="button" class="btn btn-secondary" id="btn-add-all" data-i18n="btnAddAll">Add All</button>
+          <button type="button" class="btn btn-secondary" id="btn-clear" data-i18n="btnClear">Clear</button>
+          <button type="button" class="btn btn-primary" id="btn-start-study" data-i18n="btnStartStudy">Start Study</button>
         </div>
       </section>
 
-      <!-- 分组选择 -->
       <section id="view-groups" class="view">
         <div class="view-header">
           <span class="view-icon">კ</span>
           <div>
-            <h1>按组学习</h1>
-            <h2>元音 · 普通 · 送气 · 挤喉</h2>
-            <p class="hint">按发音类型分组，适合循序渐进记忆。</p>
+            <h1 data-i18n="groupsTitle">Learn by Group</h1>
+            <h2 data-i18n="groupsSubtitle">Vowels · Basic · Aspirated · Ejective</h2>
+            <p class="hint" data-i18n="groupsHint">Grouped by sound type for step-by-step learning.</p>
           </div>
         </div>
         <div id="groups-container"></div>
       </section>
 
-      <!-- 练习 -->
       <section id="view-study" class="view">
         <div class="view-header compact">
           <div>
-            <h1>练习</h1>
-            <p class="hint" id="study-hint">输入对应的拉丁转写</p>
+            <h1 data-i18n="studyTitle">Study</h1>
+            <p class="hint" id="study-hint" data-i18n="studyHintDefault">Enter the matching romanization</p>
           </div>
           <div class="study-stats">
             <span id="study-progress">0 / 0</span>
@@ -75,8 +76,8 @@
         </div>
 
         <div id="study-empty" class="study-empty">
-          <p>请先在「字母」或「分组」页面选择至少一个字母。</p>
-          <button type="button" class="btn btn-primary" data-view="select">去选择字母</button>
+          <p data-i18n="studyEmpty">Select at least one letter on the Letters or Groups tab first.</p>
+          <button type="button" class="btn btn-primary" data-view="select" data-i18n="btnGoSelect">Choose Letters</button>
         </div>
 
         <div id="study-active" class="study-active hidden">
@@ -89,88 +90,87 @@
               type="text"
               id="study-input"
               class="study-input"
-              placeholder="输入转写…"
+              data-i18n-placeholder="inputRoman"
+              placeholder="Enter romanization…"
               spellcheck="false"
               autocapitalize="off"
               autocomplete="off"
             >
-            <button type="submit" class="btn btn-primary">确认</button>
+            <button type="submit" class="btn btn-primary" data-i18n="btnConfirm">Confirm</button>
           </form>
           <div id="study-feedback" class="study-feedback" aria-live="polite"></div>
           <div class="study-actions">
-            <button type="button" class="btn btn-secondary" id="btn-skip">跳过</button>
-            <button type="button" class="btn btn-secondary" id="btn-speak">🔊 发音</button>
-            <button type="button" class="btn btn-secondary" id="btn-reveal">显示答案</button>
+            <button type="button" class="btn btn-secondary" id="btn-skip" data-i18n="btnSkip">Skip</button>
+            <button type="button" class="btn btn-secondary" id="btn-speak" data-i18n="btnSpeak">🔊 Play</button>
+            <button type="button" class="btn btn-secondary" id="btn-reveal" data-i18n="btnReveal">Show Answer</button>
           </div>
         </div>
 
         <div id="study-done" class="study-done hidden">
-          <h2>本轮完成！</h2>
+          <h2 data-i18n="studyDoneTitle">Round complete!</h2>
           <p id="study-summary"></p>
           <div class="actions">
-            <button type="button" class="btn btn-secondary" data-view="select">返回选择</button>
-            <button type="button" class="btn btn-primary" id="btn-restart">再来一轮</button>
+            <button type="button" class="btn btn-secondary" data-view="select" data-i18n="btnBackSelect">Back to Selection</button>
+            <button type="button" class="btn btn-primary" id="btn-restart" data-i18n="btnRestart">Study Again</button>
           </div>
         </div>
       </section>
 
-      <!-- 设置 -->
       <section id="view-settings" class="view">
         <div class="view-header">
           <span class="view-icon">⚙</span>
           <div>
-            <h1>设置</h1>
-            <h2>练习偏好</h2>
+            <h1 data-i18n="settingsTitle">Settings</h1>
+            <h2 data-i18n="settingsSubtitle">Study preferences</h2>
           </div>
         </div>
         <form id="settings-form" class="settings-form">
           <label class="setting-row">
-            <span class="setting-label">练习方向</span>
+            <span class="setting-label" data-i18n="settingDirection">Study direction</span>
             <select id="setting-direction">
-              <option value="letter-to-roman">字母 → 转写</option>
-              <option value="roman-to-letter">转写 → 字母</option>
+              <option value="letter-to-roman" data-i18n="optLetterToRoman">Letter → romanization</option>
+              <option value="roman-to-letter" data-i18n="optRomanToLetter">Romanization → letter</option>
             </select>
           </label>
           <label class="setting-row">
-            <span class="setting-label">题目顺序</span>
+            <span class="setting-label" data-i18n="settingOrder">Question order</span>
             <select id="setting-order">
-              <option value="random">随机</option>
-              <option value="sequential">按字母表顺序</option>
+              <option value="random" data-i18n="optRandom">Random</option>
+              <option value="sequential" data-i18n="optSequential">Alphabetical</option>
             </select>
           </label>
           <label class="setting-row">
-            <span class="setting-label">显示 IPA 音标</span>
+            <span class="setting-label" data-i18n="settingShowIpa">Show IPA</span>
             <input type="checkbox" id="setting-show-ipa" checked>
           </label>
           <label class="setting-row">
-            <span class="setting-label">显示例词</span>
+            <span class="setting-label" data-i18n="settingShowExample">Show example words</span>
             <input type="checkbox" id="setting-show-example" checked>
           </label>
           <label class="setting-row">
-            <span class="setting-label">答错后自动显示答案</span>
+            <span class="setting-label" data-i18n="settingAutoReveal">Show correct answer when wrong</span>
             <input type="checkbox" id="setting-auto-reveal" checked>
           </label>
         </form>
       </section>
 
-      <!-- 首页 / 关于 -->
       <section id="view-home" class="view">
         <div class="view-header">
           <span class="view-icon">🇬🇪</span>
           <div>
             <h1>Real Mkhedruli</h1>
-            <h2>学习格鲁吉亚语字母</h2>
+            <h2 data-i18n="homeSubtitle">Learn the Georgian alphabet</h2>
           </div>
         </div>
         <div class="about-content">
-          <p>参照 <a href="https://realkana.com/hiragana/single" target="_blank" rel="noopener">Real Kana</a> 的设计，帮助你快速掌握格鲁吉亚语 <strong>Mkhedruli</strong> 字母（მხედრული）。</p>
-          <p>现代标准格鲁吉亚语共有 <strong>33</strong> 个字母：5 个元音、28 个辅音。每个字母对应唯一发音，无大小写之分。</p>
+          <p data-i18n-html="homeIntro"></p>
+          <p data-i18n-html="homeStats"></p>
           <ol class="steps">
-            <li>在「字母」页选择要学的字母</li>
-            <li>点击「开始练习」</li>
-            <li>看到字母后输入拉丁转写（如 <code>a</code>、<code>k'</code>、<code>ts</code>）</li>
+            <li data-i18n="homeStep1">Pick letters on the Letters tab</li>
+            <li data-i18n="homeStep2">Click Start Study</li>
+            <li data-i18n-html="homeStep3"></li>
           </ol>
-          <button type="button" class="btn btn-primary" data-view="select">开始学习</button>
+          <button type="button" class="btn btn-primary" data-view="select" data-i18n="btnStartLearning">Start Learning</button>
         </div>
       </section>
 
@@ -178,20 +178,37 @@
         <div class="view-header">
           <span class="view-icon">📖</span>
           <div>
-            <h1>关于</h1>
-            <h2>转写说明</h2>
+            <h1 data-i18n="aboutTitle">About</h1>
+            <h2 data-i18n="aboutSubtitle">Romanization notes</h2>
           </div>
         </div>
         <div class="about-content">
-          <p>本网站采用常见的拉丁转写系统。挤喉音（ejective）用撇号标记，如 <code>k'</code>、<code>t'</code>、<code>ts'</code>。</p>
+          <p data-i18n-html="aboutRoman"></p>
+          <p data-i18n-html="aboutAudio"></p>
           <table class="ref-table">
             <thead>
-              <tr><th>类型</th><th>字母</th><th>说明</th></tr>
+              <tr>
+                <th data-i18n="refType">Type</th>
+                <th data-i18n="refLetters">Letters</th>
+                <th data-i18n="refNotes">Notes</th>
+              </tr>
             </thead>
             <tbody>
-              <tr><td>元音</td><td>ა ე ი ო უ</td><td>a, e, i, o, u</td></tr>
-              <tr><td>送气音</td><td>თ ფ ქ ჩ ც</td><td>发音时伴随气流，如 t, p, k, ch, ts</td></tr>
-              <tr><td>挤喉音</td><td>კ ტ პ წ ჭ ყ</td><td>喉部闭锁弹出，如 k', t', p', ts', ch', q'</td></tr>
+              <tr>
+                <td data-i18n="refVowels">Vowels</td>
+                <td>ა ე ი ო უ</td>
+                <td data-i18n="refVowelsNote">a, e, i, o, u</td>
+              </tr>
+              <tr>
+                <td data-i18n="refAspirated">Aspirated</td>
+                <td>თ ფ ქ ჩ ც</td>
+                <td data-i18n="refAspiratedNote">Pronounced with a puff of air: t, p, k, ch, ts</td>
+              </tr>
+              <tr>
+                <td data-i18n="refEjective">Ejective</td>
+                <td>კ ტ პ წ ჭ ყ</td>
+                <td data-i18n="refEjectiveNote">Glottal pop from the throat: k', t', p', ts', ch', q'</td>
+              </tr>
             </tbody>
           </table>
         </div>
@@ -200,7 +217,8 @@
   </main>
 
   <footer class="site-footer">
-    <span>Real Mkhedruli · 格鲁吉亚语字母学习工具</span>
+    <span data-i18n="footerTagline">Real Mkhedruli · Georgian alphabet learning tool</span>
+    <span class="footer-credit" data-i18n-html="footerCredit"></span>
   </footer>
 
   <script type="module" src="js/app.js"></script>

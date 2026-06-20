@@ -3,9 +3,20 @@ import {
   GROUPS,
   GRID_COLS,
   getAcceptedAnswers,
+  getExampleText,
+  getGroupDesc,
   getGroupItems,
+  getGroupLabel,
   isCorrectAnswer,
 } from './alphabet.js';
+import { playLetterAudio, preloadLetterAudio } from './audio.js';
+import {
+  applyTranslations,
+  initI18n,
+  onLangChange,
+  setLanguage,
+  t,
+} from './i18n.js';
 
 const STORAGE_KEY = 'real-mkhedruli-settings';
 const SELECT_KEY = 'real-mkhedruli-selected';
@@ -24,6 +35,7 @@ let studyQueue = [];
 let studyIndex = 0;
 let studyCorrect = 0;
 let studySkipped = 0;
+let advanceTimer = null;
 
 const views = document.querySelectorAll('.view');
 const tabs = document.querySelectorAll('.tab');
@@ -31,6 +43,9 @@ const tabs = document.querySelectorAll('.tab');
 init();
 
 function init() {
+  initI18n();
+  bindLanguage();
+  onLangChange(refreshLanguage);
   bindNavigation();
   bindSelection();
   bindStudy();
@@ -38,8 +53,28 @@ function init() {
   renderAlphabetGrid();
   renderGroups();
   renderSelectionTray();
+  preloadLetterAudio(ALPHABET);
   applySettingsToForm();
   showView('select');
+}
+
+function bindLanguage() {
+  document.querySelectorAll('.lang-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      setLanguage(btn.dataset.lang);
+    });
+  });
+}
+
+function refreshLanguage() {
+  renderGroups();
+  renderSelectionTray();
+  applySettingsToForm();
+  updateStudyHint();
+  updateStudyUI();
+  if (studyIndex < studyQueue.length && studyQueue.length > 0) {
+    refreshQuestionSub();
+  }
 }
 
 function loadSettings() {
@@ -75,18 +110,12 @@ function bindNavigation() {
     const target = event.target.closest('[data-view]');
     if (!target) return;
     event.preventDefault();
-    const view = target.dataset.view;
-    if (view === 'study' && target.id !== 'btn-start-study') {
-      startStudy();
-    }
-    showView(view);
+    showView(target.dataset.view);
   });
 
   tabs.forEach((tab) => {
     tab.addEventListener('click', () => {
-      const view = tab.dataset.view;
-      if (view === 'study') startStudy();
-      showView(view);
+      showView(tab.dataset.view);
     });
   });
 }
@@ -101,8 +130,23 @@ function showView(name) {
   });
 
   if (name === 'study') {
-    updateStudyUI();
+    if (selected.size > 0 && studyQueue.length === 0) {
+      startStudy();
+    } else {
+      updateStudyUI();
+    }
+    focusStudyInput();
   }
+}
+
+function focusStudyInput() {
+  requestAnimationFrame(() => {
+    const active = document.getElementById('study-active');
+    const input = document.getElementById('study-input');
+    if (active && !active.classList.contains('hidden') && input && !input.disabled) {
+      input.focus();
+    }
+  });
 }
 
 function bindSelection() {
@@ -156,8 +200,16 @@ function renderAlphabetGrid() {
     cell.innerHTML = `
       <span class="char-letter">${item.letter}</span>
       <span class="char-roman">${item.roman}</span>
+      <span class="char-audio" aria-hidden="true">🔊</span>
     `;
-    cell.addEventListener('click', () => toggleLetter(item.letter));
+    cell.addEventListener('click', (event) => {
+      if (event.target.closest('.char-audio')) {
+        event.stopPropagation();
+        playLetterAudio(item);
+        return;
+      }
+      toggleLetter(item.letter);
+    });
     grid.appendChild(cell);
   });
 }
@@ -176,11 +228,11 @@ function renderGroups() {
     section.innerHTML = `
       <div class="group-header">
         <div>
-          <h3>${group.label}</h3>
-          <p>${group.desc}</p>
+          <h3>${getGroupLabel(group)}</h3>
+          <p>${getGroupDesc(group)}</p>
         </div>
         <button type="button" class="btn btn-secondary btn-sm group-toggle" data-group="${group.id}">
-          ${allSelected ? '取消全选' : '全选本组'}
+          ${allSelected ? t('groupDeselectAll') : t('groupSelectAll')}
         </button>
       </div>
       <div class="char-grid group-grid" data-group-grid="${group.id}"></div>
@@ -194,8 +246,16 @@ function renderGroups() {
       cell.innerHTML = `
         <span class="char-letter">${item.letter}</span>
         <span class="char-roman">${item.roman}</span>
+        <span class="char-audio" aria-hidden="true">🔊</span>
       `;
-      cell.addEventListener('click', () => toggleLetter(item.letter));
+      cell.addEventListener('click', (event) => {
+        if (event.target.closest('.char-audio')) {
+          event.stopPropagation();
+          playLetterAudio(item);
+          return;
+        }
+        toggleLetter(item.letter);
+      });
       grid.appendChild(cell);
     });
 
@@ -220,7 +280,7 @@ function renderSelectionTray() {
   tray.innerHTML = '';
 
   if (selected.size === 0) {
-    tray.innerHTML = '<span class="tray-empty">未选择字母</span>';
+    tray.innerHTML = `<span class="tray-empty">${t('trayEmpty')}</span>`;
     return;
   }
 
@@ -236,8 +296,7 @@ function renderSelectionTray() {
 }
 
 function bindSettings() {
-  const form = document.getElementById('settings-form');
-  form.addEventListener('change', () => {
+  document.getElementById('settings-form').addEventListener('change', () => {
     settings = {
       direction: document.getElementById('setting-direction').value,
       order: document.getElementById('setting-order').value,
@@ -256,6 +315,7 @@ function applySettingsToForm() {
   document.getElementById('setting-show-ipa').checked = settings.showIpa;
   document.getElementById('setting-show-example').checked = settings.showExample;
   document.getElementById('setting-auto-reveal').checked = settings.autoReveal;
+  applyTranslations();
   updateStudyHint();
 }
 
@@ -263,11 +323,13 @@ function updateStudyHint() {
   const hint = document.getElementById('study-hint');
   hint.textContent =
     settings.direction === 'letter-to-roman'
-      ? '看到格鲁吉亚字母，输入拉丁转写'
-      : '看到转写，输入对应的格鲁吉亚字母';
+      ? t('hintLetterToRoman')
+      : t('hintRomanToLetter');
 }
 
 function startStudy() {
+  clearAdvanceTimer();
+
   const items = ALPHABET.filter((item) => selected.has(item.letter));
   if (items.length === 0) {
     studyQueue = [];
@@ -275,8 +337,7 @@ function startStudy() {
     return;
   }
 
-  studyQueue =
-    settings.order === 'random' ? shuffle([...items]) : [...items];
+  studyQueue = settings.order === 'random' ? shuffle([...items]) : [...items];
   studyIndex = 0;
   studyCorrect = 0;
   studySkipped = 0;
@@ -294,19 +355,30 @@ function shuffle(array) {
 
 function bindStudy() {
   const form = document.getElementById('study-form');
+  const input = document.getElementById('study-input');
+
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     submitAnswer();
   });
 
+  input.addEventListener('input', () => {
+    const feedback = document.getElementById('study-feedback');
+    if (input.classList.contains('incorrect')) {
+      input.classList.remove('incorrect');
+      feedback.textContent = '';
+      feedback.className = 'study-feedback';
+    }
+  });
+
   document.getElementById('btn-skip').addEventListener('click', () => {
     studySkipped += 1;
-    revealFeedback(false, true);
+    revealFeedback({ correct: false, skipped: true });
     setTimeout(nextQuestion, 900);
   });
 
   document.getElementById('btn-reveal').addEventListener('click', () => {
-    revealFeedback(false, false, true);
+    revealFeedback({ correct: false, reveal: true });
   });
 
   document.getElementById('btn-speak').addEventListener('click', speakCurrent);
@@ -331,8 +403,11 @@ function updateStudyUI() {
     empty.classList.add('hidden');
     active.classList.add('hidden');
     done.classList.remove('hidden');
-    document.getElementById('study-summary').textContent =
-      `共 ${studyQueue.length} 题，正确 ${studyCorrect}，跳过 ${studySkipped}`;
+    document.getElementById('study-summary').textContent = t('summary', {
+      total: studyQueue.length,
+      correct: studyCorrect,
+      skipped: studySkipped,
+    });
     return;
   }
 
@@ -345,7 +420,22 @@ function updateStudyUI() {
   document.getElementById('study-score').textContent = `✓ ${studyCorrect}`;
 }
 
+function refreshQuestionSub() {
+  if (studyIndex >= studyQueue.length) return;
+  const item = studyQueue[studyIndex];
+  const sub = document.getElementById('study-sub');
+  if (settings.direction === 'letter-to-roman') {
+    sub.textContent = settings.showExample ? getExampleText(item) : '';
+  } else {
+    sub.textContent = settings.showExample ? item.exampleWord.split(' ')[0] : '';
+  }
+  if (settings.showIpa) {
+    sub.textContent = [sub.textContent, item.ipa].filter(Boolean).join(' · ');
+  }
+}
+
 function showCurrentQuestion() {
+  clearAdvanceTimer();
   updateStudyUI();
   if (studyIndex >= studyQueue.length) return;
 
@@ -364,69 +454,93 @@ function showCurrentQuestion() {
   if (settings.direction === 'letter-to-roman') {
     prompt.textContent = item.letter;
     prompt.className = 'study-prompt georgian';
-    sub.textContent = settings.showExample ? item.example : '';
   } else {
     prompt.textContent = item.roman;
     prompt.className = 'study-prompt roman';
-    sub.textContent = settings.showExample ? item.example.split(' ')[0] : '';
   }
 
-  if (settings.showIpa) {
-    sub.textContent = [sub.textContent, item.ipa].filter(Boolean).join(' · ');
+  refreshQuestionSub();
+
+  input.dataset.i18nPlaceholder =
+    settings.direction === 'letter-to-roman' ? 'inputRoman' : 'inputLetter';
+  input.placeholder = t(input.dataset.i18nPlaceholder);
+
+  focusStudyInput();
+
+  if (settings.direction === 'letter-to-roman') {
+    playLetterAudio(item);
   }
-
-  input.placeholder =
-    settings.direction === 'letter-to-roman' ? '输入转写…' : '输入字母…';
-
-  input.focus();
 }
 
 function submitAnswer() {
+  if (advanceTimer) return;
+
   const input = document.getElementById('study-input');
   const item = studyQueue[studyIndex];
   const correct = isCorrectAnswer(item, input.value, settings.direction);
 
   if (correct) {
     studyCorrect += 1;
-    revealFeedback(true);
-    setTimeout(nextQuestion, 650);
-  } else {
-    revealFeedback(false);
-    if (settings.autoReveal) {
-      setTimeout(nextQuestion, 1400);
-    } else {
-      input.classList.add('incorrect');
-      input.focus();
-      input.select();
-    }
+    revealFeedback({ correct: true });
+    advanceTimer = setTimeout(() => {
+      advanceTimer = null;
+      nextQuestion();
+    }, 650);
+    return;
+  }
+
+  revealFeedback({ correct: false });
+}
+
+function clearAdvanceTimer() {
+  if (advanceTimer) {
+    clearTimeout(advanceTimer);
+    advanceTimer = null;
   }
 }
 
-function revealFeedback(correct, skipped = false, manual = false) {
+function revealFeedback({ correct, skipped = false, reveal = false }) {
   const item = studyQueue[studyIndex];
   const input = document.getElementById('study-input');
   const feedback = document.getElementById('study-feedback');
   const accepted = getAcceptedAnswers(item, settings.direction).join(' / ');
 
-  input.disabled = true;
-
   if (correct) {
+    input.disabled = true;
     input.classList.add('correct');
     feedback.className = 'study-feedback success';
-    feedback.textContent = '正确！';
+    feedback.textContent = t('correct');
     return;
   }
 
+  input.disabled = false;
   input.classList.add('incorrect');
   feedback.className = 'study-feedback error';
 
   if (skipped) {
-    feedback.textContent = `跳过 · 答案：${accepted}`;
-  } else if (manual) {
-    feedback.textContent = `答案：${accepted}${item.example ? ` · ${item.example}` : ''}`;
-  } else {
-    feedback.textContent = `不对，正确答案：${accepted}`;
+    input.disabled = true;
+    feedback.textContent = t('skippedAnswer', { answer: accepted });
+    return;
   }
+
+  if (reveal) {
+    const exampleSuffix = item.exampleWord
+      ? ` · ${getExampleText(item)}`
+      : '';
+    feedback.textContent = t('revealAnswer', {
+      answer: accepted,
+      example: exampleSuffix,
+    });
+    input.focus();
+    input.select();
+    return;
+  }
+
+  feedback.textContent = settings.autoReveal
+    ? t('wrongWithAnswer', { answer: accepted })
+    : t('wrongRetry');
+  input.focus();
+  input.select();
 }
 
 function nextQuestion() {
@@ -436,12 +550,5 @@ function nextQuestion() {
 
 function speakCurrent() {
   if (studyIndex >= studyQueue.length) return;
-  const item = studyQueue[studyIndex];
-  if (!('speechSynthesis' in window)) return;
-
-  window.speechSynthesis.cancel();
-  const utterance = new SpeechSynthesisUtterance(item.letter);
-  utterance.lang = 'ka-GE';
-  utterance.rate = 0.85;
-  window.speechSynthesis.speak(utterance);
+  playLetterAudio(studyQueue[studyIndex]);
 }
