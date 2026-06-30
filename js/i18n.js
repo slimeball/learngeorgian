@@ -41,6 +41,7 @@ export const MESSAGES = {
     settingShowIpa: 'Show IPA',
     settingShowExample: 'Show example words',
     settingAutoReveal: 'Show correct answer when wrong',
+    settingAutoPlay: 'Auto-play pronunciation on each question',
     homeSubtitle: 'Learn the Georgian alphabet',
     homeIntro:
       'Inspired by <a href="https://realkana.com/hiragana/single" target="_blank" rel="noopener">Real Kana</a>, this site helps you master the Georgian <strong>Mkhedruli</strong> alphabet (მხედრული).',
@@ -163,6 +164,7 @@ export const MESSAGES = {
     settingShowIpa: '顯示 IPA 音標',
     settingShowExample: '顯示例詞',
     settingAutoReveal: '答錯後顯示正確答案',
+    settingAutoPlay: '每題自動播放發音',
     homeSubtitle: '學習格魯吉亞語字母',
     homeIntro:
       '參照 <a href="https://realkana.com/hiragana/single" target="_blank" rel="noopener">Real Kana</a> 的設計，幫助你快速掌握格魯吉亞語 <strong>Mkhedruli</strong> 字母（მხედრული）。',

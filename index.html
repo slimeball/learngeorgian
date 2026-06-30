@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Georgian:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/handwriting.css">
 </head>
 <body>
   <header class="site-header">
@@ -82,7 +83,10 @@
 
         <div id="study-active" class="study-active hidden">
           <div class="prompt-card">
-            <div id="study-prompt" class="study-prompt">ა</div>
+            <div class="study-prompt-wrap">
+              <div id="study-prompt" class="study-prompt">ა</div>
+              <span id="study-handwriting" class="study-handwriting" aria-hidden="true"></span>
+            </div>
             <div id="study-sub" class="study-sub"></div>
           </div>
           <form id="study-form" class="study-form" autocomplete="off">
@@ -150,6 +154,10 @@
           <label class="setting-row">
             <span class="setting-label" data-i18n="settingAutoReveal">Show correct answer when wrong</span>
             <input type="checkbox" id="setting-auto-reveal" checked>
+          </label>
+          <label class="setting-row">
+            <span class="setting-label" data-i18n="settingAutoPlay">Auto-play pronunciation</span>
+            <input type="checkbox" id="setting-auto-play" checked>
           </label>
         </form>
       </section>

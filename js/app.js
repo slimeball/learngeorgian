@@ -27,6 +27,7 @@ const defaultSettings = {
   showIpa: true,
   showExample: true,
   autoReveal: true,
+  autoPlay: true,
 };
 
 let settings = loadSettings();
@@ -303,6 +304,7 @@ function bindSettings() {
       showIpa: document.getElementById('setting-show-ipa').checked,
       showExample: document.getElementById('setting-show-example').checked,
       autoReveal: document.getElementById('setting-auto-reveal').checked,
+      autoPlay: document.getElementById('setting-auto-play').checked,
     };
     saveSettings();
     updateStudyHint();
@@ -315,6 +317,7 @@ function applySettingsToForm() {
   document.getElementById('setting-show-ipa').checked = settings.showIpa;
   document.getElementById('setting-show-example').checked = settings.showExample;
   document.getElementById('setting-auto-reveal').checked = settings.autoReveal;
+  document.getElementById('setting-auto-play').checked = settings.autoPlay;
   applyTranslations();
   updateStudyHint();
 }
@@ -434,6 +437,17 @@ function refreshQuestionSub() {
   }
 }
 
+function updateStudyHandwriting(item, visible) {
+  const el = document.getElementById('study-handwriting');
+  el.classList.remove('visible');
+  delete el.dataset.letter;
+
+  if (!visible) return;
+
+  el.dataset.letter = item.letter;
+  el.classList.add('visible');
+}
+
 function showCurrentQuestion() {
   clearAdvanceTimer();
   updateStudyUI();
@@ -454,9 +468,11 @@ function showCurrentQuestion() {
   if (settings.direction === 'letter-to-roman') {
     prompt.textContent = item.letter;
     prompt.className = 'study-prompt georgian';
+    updateStudyHandwriting(item, true);
   } else {
     prompt.textContent = item.roman;
     prompt.className = 'study-prompt roman';
+    updateStudyHandwriting(item, false);
   }
 
   refreshQuestionSub();
@@ -467,7 +483,7 @@ function showCurrentQuestion() {
 
   focusStudyInput();
 
-  if (settings.direction === 'letter-to-roman') {
+  if (settings.autoPlay) {
     playLetterAudio(item);
   }
 }

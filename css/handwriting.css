@@ -1,0 +1,36 @@
+/* Sprite: images/handwriting.png · 1099×529 · 11×3 grid
+   Tune individual letters by editing background-position below. */
+
+.study-handwriting[data-letter="ა"] { background-position: 21 8; }
+.study-handwriting[data-letter="ბ"] { background-position: calc(var(--hw-cell-w) * -0.7) 0; }
+.study-handwriting[data-letter="გ"] { background-position: calc(var(--hw-cell-w) * -1.7) 0; }
+.study-handwriting[data-letter="დ"] { background-position: calc(var(--hw-cell-w) * -3) 0; }
+.study-handwriting[data-letter="ე"] { background-position: calc(var(--hw-cell-w) * -3.9) 0; }
+.study-handwriting[data-letter="ვ"] { background-position: calc(var(--hw-cell-w) * -4.7) 0; }
+.study-handwriting[data-letter="ზ"] { background-position: calc(var(--hw-cell-w) * -5.7) 0; }
+.study-handwriting[data-letter="თ"] { background-position: calc(var(--hw-cell-w) * -7) 0; }
+.study-handwriting[data-letter="ი"] { background-position: calc(var(--hw-cell-w) * -8) 0; }
+.study-handwriting[data-letter="კ"] { background-position: calc(var(--hw-cell-w) * -9) 0; }
+.study-handwriting[data-letter="ლ"] { background-position: calc(var(--hw-cell-w) * -10) 0; }
+.study-handwriting[data-letter="მ"] { background-position: 0 calc(var(--hw-cell-h) * -1); }
+.study-handwriting[data-letter="ნ"] { background-position: calc(var(--hw-cell-w) * -0.7) calc(var(--hw-cell-h) * -1); }
+.study-handwriting[data-letter="ო"] { background-position: calc(var(--hw-cell-w) * -1.7) calc(var(--hw-cell-h) * -1); }
+.study-handwriting[data-letter="პ"] { background-position: calc(var(--hw-cell-w) * -2.7) calc(var(--hw-cell-h) * -1); }
+.study-handwriting[data-letter="ჟ"] { background-position: calc(var(--hw-cell-w) * -3.6) calc(var(--hw-cell-h) * -1); }
+.study-handwriting[data-letter="რ"] { background-position: calc(var(--hw-cell-w) * -4.6) calc(var(--hw-cell-h) * -1); }
+.study-handwriting[data-letter="ს"] { background-position: calc(var(--hw-cell-w) * -5.6) calc(var(--hw-cell-h) * -1); }
+.study-handwriting[data-letter="ტ"] { background-position: calc(var(--hw-cell-w) * -6.7) calc(var(--hw-cell-h) * -1); }
+.study-handwriting[data-letter="უ"] { background-position: calc(var(--hw-cell-w) * -8) calc(var(--hw-cell-h) * -1); }
+.study-handwriting[data-letter="ფ"] { background-position: calc(var(--hw-cell-w) * -8.8) calc(var(--hw-cell-h) * -1); }
+.study-handwriting[data-letter="ქ"] { background-position: calc(var(--hw-cell-w) * -10) calc(var(--hw-cell-h) * -1); }
+.study-handwriting[data-letter="ღ"] { background-position: 0 calc(var(--hw-cell-h) * -2); }
+.study-handwriting[data-letter="ყ"] { background-position: calc(var(--hw-cell-w) * -1) calc(var(--hw-cell-h) * -2); }
+.study-handwriting[data-letter="შ"] { background-position: calc(var(--hw-cell-w) * -2) calc(var(--hw-cell-h) * -2); }
+.study-handwriting[data-letter="ჩ"] { background-position: calc(var(--hw-cell-w) * -3) calc(var(--hw-cell-h) * -2); }
+.study-handwriting[data-letter="ც"] { background-position: calc(var(--hw-cell-w) * -4) calc(var(--hw-cell-h) * -2); }
+.study-handwriting[data-letter="ძ"] { background-position: calc(var(--hw-cell-w) * -5) calc(var(--hw-cell-h) * -2); }
+.study-handwriting[data-letter="წ"] { background-position: calc(var(--hw-cell-w) * -6) calc(var(--hw-cell-h) * -2); }
+.study-handwriting[data-letter="ჭ"] { background-position: calc(var(--hw-cell-w) * -7) calc(var(--hw-cell-h) * -2); }
+.study-handwriting[data-letter="ხ"] { background-position: calc(var(--hw-cell-w) * -8) calc(var(--hw-cell-h) * -2); }
+.study-handwriting[data-letter="ჯ"] { background-position: calc(var(--hw-cell-w) * -9) calc(var(--hw-cell-h) * -2); }
+.study-handwriting[data-letter="ჰ"] { background-position: calc(var(--hw-cell-w) * -10) calc(var(--hw-cell-h) * -2); }
